@@ -1,0 +1,26 @@
+name: Attach .skill to release
+
+# When a GitHub release is published, build the versioned .skill and attach it
+# as a release asset. The .skill name uses the package.json version, so bump and
+# commit (npm run bump -- <version>) before tagging/releasing to keep them in sync.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest # the `zip` binary is preinstalled on GitHub-hosted runners
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+      - run: npm run build # no install needed — zero dependencies
+      - name: Upload .skill to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$TAG" dist/*.skill --clobber
