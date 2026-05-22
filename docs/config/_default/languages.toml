@@ -1,0 +1,8 @@
+[en]
+  languageName = "English"
+  contentDir = "content"
+  weight = 10
+  [en.params]
+    languageISO = "EN"
+    languageTag = "en-US"
+    footer = 'Brought to you by the <a class="text-muted" href="https://dyspatch.io/">#emailgeeks at Dyspatch</a>'

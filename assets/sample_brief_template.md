@@ -99,7 +99,7 @@ If you don't know yet, the skill will propose defaults based on your ESP and cam
 ## Optional outputs the skill can add
 
 The skill will also offer:
-- **Recommendations pass** — 1–3 research-backed suggestions for how this specific campaign could land harder (segmentation, layout choice, newer techniques). Each accepted recommendation gets logged in a "Recommendations applied" callout at the top.
+- **Recommendations pass** — 1–3 research-backed suggestions for how this specific campaign could land harder (segmentation, layout choice, newer techniques — including ones tuned to your email platform's capabilities). Every suggestion is logged in a "Recommendations" section with its status (`✓` accepted, `~` modified, `✗` rejected with a reason), so you keep a full audit trail of what was considered.
 - **Sample email** — a markdown table of suggested content blocks (header, hero, body sections, CTAs, footer) tuned to the goal and audience, with directional draft copy in each block. If you provide copy, it's used as the spine and augmented; not overwritten. You can also ask for a skeleton-only version (blocks without copy).
 
 ## For multi-email campaigns

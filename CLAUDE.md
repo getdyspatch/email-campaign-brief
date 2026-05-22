@@ -15,6 +15,7 @@ The skill uses progressive disclosure — only `SKILL.md` is always in context; 
 - `SKILL.md` — entry point and the 10-step interview flow (Step 0 through Step 10). Always loaded. The YAML frontmatter `description` is **load-bearing**: it controls when the skill auto-triggers. It is deliberately stuffed with trigger phrases and capability summary. Editing it changes triggering behavior — change it intentionally, not for tidiness.
 - `references/section_guide.md` — for each brief section: the question to ask, what a "good" answer looks like, failure modes, and a concrete example. The skill reads this before pushing back on a vague user answer.
 - `references/email_specifics.md` — rationale and detail for the email-only elements (production paths, localization, UTMs, suppression, legal regimes, exit conditions, per-email mini-sections).
+- `references/proven_patterns.md` — curated, community-updatable library of techniques that have worked for specific email types / verticals, each with evidence and a source/contributor. Consulted during research (Step 5) and recommendations (Step 6); **not** part of the brief structure. Has a documented contribution format so it grows over time. Measurable claims require a real source — unsourced ones are marked `[needs source]` and stated qualitatively.
 - `assets/brief_template.md` — the structural template the final brief is assembled from. Read and filled in during Step 8.
 - `assets/sample_brief_template.md` — the same structure annotated with "what goes here" instructions, returned **verbatim** when the user asks for a sample/blank/example (Step 0.5). It is user-facing output, not internal guidance.
 
@@ -30,7 +31,7 @@ These are deliberate product decisions baked throughout the files. Preserve them
 - **Single Minded Idea** = 8 words or fewer, no `and`/`or`/`but`, and is distinct from the Goal (SMI = the message; Goal = the measurable outcome). Multiple files reinforce this separation.
 - **Goal must be quantitative** (a number + a timeframe). The flow pushes back on fuzzy goals.
 - **The UTM section always appears in the final brief**, even if the user shrugs — propose defaults and confirm, never omit.
-- **Recommendations phase (Step 6) is a strict two-turn gate**: generate → stop → wait for per-rec yes/no/modify → then draft. Never draft the brief in the same turn as the recommendations. Max 3 recommendations.
+- **Recommendations phase (Step 6) is a strict two-turn gate**: generate → stop → wait for per-rec yes/no/modify → then draft. Never draft the brief in the same turn as the recommendations. Max 3 recommendations. The final brief's **Recommendations** section tracks *every* suggestion with a status marker (`✓` accepted / `~` modified / `✗` rejected + reason) — a full audit trail, not accepted-only. (Recommendations is a rename of the former "Recommendations Applied"; it's the same section, so the four-file sync still holds.)
 - **Budget section only exists if external production is involved** (agency, freelancer, designer+dev, paid media). Otherwise omit it entirely.
 - **Tool neutrality**: never volunteer a specific ESP/production tool (Mailchimp, Stensul, Knak, etc.) when asking about production path. Only research/compare tools if the user asks.
 - **Inline draft review before file output** (Step 8): always show the full draft and iterate before producing any file.

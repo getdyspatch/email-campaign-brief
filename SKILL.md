@@ -2,7 +2,7 @@
 name: email-campaign-brief
 description: Generates a tight, professional email marketing brief through a guided interview. Use whenever the user is planning, scoping, or about to write an email campaign — welcome series, nurture flows, promotional sends, newsletters, product launches, lifecycle/automation, abandonment, re-engagement, or any other email send. Triggers on phrases like "write a brief for my email campaign", "creative brief for an email", "help me scope an email send", "draft a brief for a 3-email nurture", "we're planning a launch email", or any time the user starts an email project with stakeholders, agencies, designers, copywriters, or developers. Also triggers on requests for a sample/blank brief ("show me what a brief looks like", "give me the brief template", "what info do I need for an email brief"). Works for one email or a multi-email sequence. Produces Markdown (default), Word doc, or HTML, and remembers the choice. Includes optional recommendations, sample layout, and sample copy generation.
 metadata:
-  version: "2.0.1"
+  version: "2.1.1"
 ---
 
 # Email Campaign Brief
@@ -91,7 +91,7 @@ These elements are what makes an email brief different from a generic creative b
 - **Production path** — ask the user generically first: "How will this get built? Pick the closest fit: (a) we have an Email Design System / modular template library, (b) we hand-code HTML / use snippets, (c) we'll need a designer + dev to produce something new, (d) other / unsure." Their answer drives the Timing & Mandatories sections. If the user asks for options or guidance (e.g., "what tools do people use?", "what's an EDS?", "recommend something"), it's fine to research and surface a few neutral options — present them as a comparison, not as a pitch, and let the user choose.
 - **Suppression / exclusion lists** — ask explicitly: "Are there any audiences who must NOT receive this campaign? Common examples: recent purchasers, paid customers (for free-trial campaigns), unsubscribed-from-marketing, employees, competitor domains, sales-engaged accounts, GDPR opt-out segments." This is where a lot of "wait we sent it to *who*?" incidents come from — don't let the user skip it.
 - **UTM parameters / link tracking** — **always include this section in the final brief; do not skip it even if the user shrugs.** Ask: "What UTM parameters should we use for links in this campaign? The conventions are usually:
-  - `utm_source` — the email sending platform (Mailchimp / Marketo / Klaviyo / Iterable / whatever)
+  - `utm_source` — the email sending platform (Mailchimp / Marketo / Klaviyo / Iterable / whatever). **Capture the ESP by name even beyond the UTM** — it also drives the capability-tailored recommendations in Step 6 (what techniques their platform can actually build)
   - `utm_medium` — typically `email`, but some teams use `email_lifecycle` / `email_campaign` to distinguish flows from blasts
   - `utm_campaign` — the campaign name, **same value across every email in the campaign** so downstream analytics can group them
   - `utm_term` — often used to mark which step in the sequence (e.g., `email-1` / `welcome-step-1`); optional but recommended for multi-email campaigns
@@ -125,14 +125,21 @@ If you detect any of those, ask once: "Sounds like there's external production c
 
 If there is no external production, omit the budget section entirely.
 
-### Step 5: Web research (if allowed)
+### Step 5: Market & audience research (recommended, if allowed)
 
-If the user opted in to web research, use it sparingly — to *pressure-test*, not to *generate*. Useful places to look:
-- Competitor email examples or recent campaigns from peers
-- Audience signals (subreddits, review sites, public communities) to sharpen the target description
-- Industry benchmarks for the Proof Points
+If the user opted in to web research (Step 1), do a focused market-research pass. This is the one place the skill actively *generates* signal rather than only pressure-testing — but everything you find still gets surfaced for the user to accept or reject before it lands. Research three things:
 
-Before adding anything you found to the brief, surface it to the user with a one-line summary and a source link, and let them accept or reject it. Never silently insert researched facts.
+- **Audience signals** — communities, review sites, public discussion (subreddits, G2/Capterra, forums) to sharpen the persona from "plausible" to "specific." Look for the language the audience actually uses, the objections they raise, the moment they're in.
+- **Competitor scan** — recent campaigns or email examples from peers in this vertical and email type. What's the category convention, and where's the opening to break from it?
+- **Industry benchmarks** — realistic numbers to back the Proof Points and pressure-test the Measurement Plan (typical open / CTR / conversion for this email type and vertical).
+
+Also consult `references/proven_patterns.md` — the local pattern library — for techniques that have worked for this email type or vertical.
+
+Feed findings two ways: **back into Step 2** (tighten Target Audience, Opportunity, and Proof Points) and **forward into Step 6** (evidence for recommendations). Findings do **not** get their own brief section — they sharpen existing sections and back recommendations, keeping the core brief lean.
+
+**Discipline (unchanged):** surface every finding with a one-line summary and a source link, and let the user accept or reject it before it touches the brief. Never silently insert researched facts.
+
+If the user **declined** web research in Step 1, skip the live search — but you can still consult `references/proven_patterns.md` (it's a local file, not a web fetch). Flag clearly that any audience/competitor reasoning is from model knowledge, not freshly sourced.
 
 ### Step 6: Recommendations phase (offer before drafting)
 
@@ -145,7 +152,7 @@ If the user agrees, the flow is **strictly two turns** — generate, then wait f
 **Turn 1 — generate and present.**
 
 1. **Re-read the brief context** — type of message, audience, goal, SMI, mandatories, production path, the user's industry/company. Look for friction or missed leverage.
-2. **Research, if web is enabled** — search for: (a) current best-in-class examples of this email type in the user's industry, (b) recent techniques applicable to this campaign (e.g., interactive AMP modules for ecommerce, dark-mode hero design for SaaS launches, kinetic/CSS-animated headers for product reveals), (c) segmentation studies relevant to the goal.
+2. **Research, if web is enabled** — search for: (a) current best-in-class examples of this email type in the user's industry/vertical, (b) recent techniques applicable to this campaign (e.g., interactive AMP modules for ecommerce, dark-mode hero design for SaaS launches, kinetic/CSS-animated headers for product reveals), (c) **capabilities of the user's ESP** (captured in Step 3, or recovered from memory in Step 0) — what does *their* platform actually support (dynamic/conditional content, send-time optimization, AMP, A/B automation, predictive segments)? Only recommend techniques their stack can actually build, (d) segmentation studies relevant to the goal. **Consult `references/proven_patterns.md` as a first-class source** alongside web research — prefer a proven, sourced pattern over a freshly-searched claim.
 3. **Produce 1–3 recommendations only — not a wall of suggestions.** Each recommendation must be:
    - **Specific to this brief** (reference the user's company, audience, or goal — not generic best practices)
    - **Actionable** (the user can decide yes/no and the brief reflects the change)
@@ -161,7 +168,7 @@ If the user agrees, the flow is **strictly two turns** — generate, then wait f
 
 **Turn 2 — apply decisions and continue.**
 
-After the user responds, record which recommendations were accepted (with any modifications), which were rejected, and any new direction the user gave. Carry these into Step 7 and Step 8. Accepted recommendations get incorporated into the relevant section of the brief (audience, mandatories, executional guidelines, etc.) AND get a one-line note in a "Recommendations applied" callout at the top of the brief, so the team knows why a choice was made. Rejected recommendations are dropped silently — don't include them in the brief or relitigate them.
+After the user responds, record each recommendation's disposition. Carry these into Step 7 and Step 8. Accepted (and modified) recommendations get incorporated into the relevant section of the brief (audience, mandatories, executional guidelines, etc.) AND get listed in a "Recommendations" section near the top, each with a status marker: `✓` accepted, `~` accepted-with-modification, `✗` rejected (with a one-line reason). The point is a full audit trail — the team can see what was considered and why a choice was made, not just what survived. Don't relitigate rejected ones; record them with their reason and move on.
 
 If the user declines the recommendations pass entirely in the initial offer, skip straight to Step 7.
 
@@ -256,5 +263,6 @@ This is also the user's chance to correct what gets persisted.
 
 - `references/section_guide.md` — what good vs. bad looks like for each brief section, with examples and anti-patterns. Read this before pushing back on a vague user answer.
 - `references/email_specifics.md` — rationale and detail for the email-specific elements (production paths, assets, per-email mini-sections, testing/QA flags).
+- `references/proven_patterns.md` — curated, community-updatable library of techniques that have worked for specific email types / verticals, each with evidence and a source. Consulted during research (Step 5) and recommendations (Step 6). Includes a contribution format so it grows over time.
 - `assets/brief_template.md` — the structural template the final brief should follow.
 - `assets/sample_brief_template.md` — the same structure annotated with section-by-section "what to fill in here" instructions, returned directly when the user asks for a sample/blank brief.

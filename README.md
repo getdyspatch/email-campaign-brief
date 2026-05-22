@@ -2,6 +2,8 @@
 
 A [Claude Agent Skill](https://agentskills.io) that walks a marketer through producing a tight, opinionated **email campaign brief** in a guided interview — then hands back a clean Markdown, Word, or HTML document.
 
+🌐 **[getdyspatch.github.io/email-campaign-brief](https://getdyspatch.github.io/email-campaign-brief/)** — what it does, and a one-click download.
+
 The brief is deliberately short (1.5 pages or less). A long brief is usually a tell that the strategy isn't clear yet, so the skill pushes back on vague goals, fuzzy audiences, and multi-idea messaging until each section actually lands.
 
 > 📄 **Preview the output** — [`assets/brief_template.md`](assets/brief_template.md) shows the full structure of a generated brief, section by section.

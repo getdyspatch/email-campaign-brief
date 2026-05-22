@@ -23,4 +23,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.event.release.tag_name }}
-        run: gh release upload "$TAG" dist/*.skill --clobber
+        # Attach the versioned .skill plus a stable, versionless copy so the
+        # marketing site can link to releases/latest/download/email-campaign-brief.skill
+        run: |
+          cp dist/email-campaign-brief-*.skill email-campaign-brief.skill
+          gh release upload "$TAG" dist/*.skill email-campaign-brief.skill --clobber

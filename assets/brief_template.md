@@ -9,11 +9,13 @@
 
 ---
 
-[Optional — only if the recommendations phase was run AND the user accepted one or more:]
+[Optional — only if the recommendations phase was run and produced suggestions:]
 
-## Recommendations Applied
-- [One-line note per accepted recommendation, e.g., "Segmenting send into paid-customer and prospect variants to lift CTR (~14% based on industry data)"]
-- [Another, if applicable]
+## Recommendations
+*Every suggestion from the recommendations pass with its disposition — `✓` accepted, `~` accepted with modification, `✗` rejected (with a one-line reason). A full audit trail of what was considered.*
+1. ✓ [Accepted rec, e.g., "Segment send into paid-customer and prospect variants to lift CTR (~14% per industry data ([source]))"]
+2. ~ [Modified rec, e.g., "Inline product GIF — accepted, but drop the side-by-side comparison"]
+3. ✗ [Rejected rec, e.g., "Kinetic CSS-animated hero — declined (timeline too tight)"]
 
 ---
 

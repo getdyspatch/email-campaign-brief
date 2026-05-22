@@ -1,8 +1,9 @@
 {
   "name": "email-campaign-brief",
-  "version": "2.0.1",
+  "version": "2.1.1",
   "private": true,
   "type": "module",
+  "license": "AGPL-3.0-only",
   "description": "Tooling to version, test, and package the email-campaign-brief Claude skill.",
   "scripts": {
     "test": "node --test \"tests/**/*.test.mjs\"",
