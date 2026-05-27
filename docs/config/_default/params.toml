@@ -5,6 +5,7 @@ images = ["cover.png"]
 
 # Skill links (used by the homepage layout in layouts/home.html)
 skillDownloadURL = "https://github.com/getdyspatch/email-campaign-brief/releases/latest/download/email-campaign-brief.skill"
+skillDyspatchDownloadURL = "https://github.com/getdyspatch/email-campaign-brief/releases/latest/download/email-campaign-brief-dyspatch.skill"
 skillRepoURL = "https://github.com/getdyspatch/email-campaign-brief"
 
 # mainSections

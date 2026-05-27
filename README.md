@@ -6,7 +6,9 @@ A [Claude Agent Skill](https://agentskills.io) that walks a marketer through pro
 
 The brief is deliberately short (1.5 pages or less). A long brief is usually a tell that the strategy isn't clear yet, so the skill pushes back on vague goals, fuzzy audiences, and multi-idea messaging until each section actually lands.
 
-> 📄 **Preview the output** — [`assets/brief_template.md`](assets/brief_template.md) shows the full structure of a generated brief, section by section.
+> 📄 **Preview the output** — [`shared/assets/brief_template.md`](shared/assets/brief_template.md) shows the full structure of a generated brief, section by section.
+
+> 🟣 **Build email in [Dyspatch](https://www.dyspatch.io)?** There's a [Dyspatch-specific variant](#two-variants) that grounds the sample layout in your account's real modules. You don't need a Dyspatch account to use this skill — the standard version is tool-neutral and works with any ESP; this variant just produces sharper briefs for teams who build in Dyspatch.
 
 ---
 
@@ -31,24 +33,39 @@ It works for a single send or a multi-email sequence (welcome series, nurture, l
   - **Recommendations pass** — 1–3 research-backed, brief-specific suggestions for how the campaign could land harder.
   - **Sample email** — a content-block table (header, hero, body, CTAs, footer) with directional draft copy tuned to your audience.
 
+## Two variants
+
+This repo ships **two** skills built from the same brief methodology:
+
+- **`email-campaign-brief`** — the generic, tool-neutral skill. It never assumes which email-design or sending platform you use.
+- **`email-campaign-brief-dyspatch`** — a variant for teams who design and produce email in **[Dyspatch.io](https://www.dyspatch.io)**. It assumes Dyspatch is your production path and, when the [Dyspatch MCP server](https://github.com/getdyspatch/dyspatch-mcp) or API is connected, pulls your account's real **modules/blocks** so the sample layout references blocks you can actually drop into Dyspatch.
+
+Everything else — the interview, the brief structure, compliance/localization/UTM handling, recommendations — is identical. Pick the generic skill unless you build in Dyspatch.
+
 ## Installation
 
-This is a standard Agent Skill — a directory containing `SKILL.md`. Install it wherever your agent looks for skills.
+Each skill is a standard Agent Skill — a directory containing `SKILL.md`. Install whichever you want wherever your agent looks for skills.
 
-**Claude Code** (skills live in `~/.claude/skills/`):
-
-```bash
-git clone https://github.com/<your-org>/campaign-brief-skill.git
-cp -r campaign-brief-skill ~/.claude/skills/email-campaign-brief
-```
-
-Or use a packaged release: download the `email-campaign-brief-<version>.skill` file (a zip), then unzip it into your skills directory:
+**Claude Code** (skills live in `~/.claude/skills/`) — use a packaged release. Download the `.skill` file (a zip) for the variant you want, then unzip it into your skills directory:
 
 ```bash
+# Generic
 unzip email-campaign-brief-<version>.skill -d ~/.claude/skills/
+# Dyspatch variant
+unzip email-campaign-brief-dyspatch-<version>.skill -d ~/.claude/skills/
 ```
 
-The unpacked folder must be named `email-campaign-brief` (matching the skill name). Restart your agent if it caches the skill list.
+The unpacked folder is named after the skill (`email-campaign-brief` or `email-campaign-brief-dyspatch`); leave it as-is. Restart your agent if it caches the skill list.
+
+To work from source instead, clone the repo and copy a skill's built folder (run `npm run build` first), or copy `skills/<name>/SKILL.md` together with the `shared/references` and `shared/assets` files into one directory.
+
+**Dyspatch variant — connecting your account (optional but recommended).** Add the Dyspatch MCP server so the skill can read your modules:
+
+```bash
+claude mcp add dyspatch -e DYSPATCH_API_KEY=YOUR_KEY -- npx dyspatch-mcp
+```
+
+Without it, the Dyspatch skill still works — it just asks you to paste your module names or falls back to a generic block list.
 
 ## Usage
 
@@ -75,15 +92,18 @@ Want to see the format before committing? Ask for a sample and the skill returns
 
 ## Repository layout
 
-The skill is plain Markdown; only `SKILL.md` is always in context, with the rest pulled in on demand.
+The skills are plain Markdown; only `SKILL.md` is always in context, with the rest pulled in on demand. Each skill owns its `SKILL.md`; the references and assets are single-sourced under `shared/` and composed into each skill's package at build time.
 
 | Path | Purpose |
 | --- | --- |
-| `SKILL.md` | Entry point and the step-by-step interview flow. |
-| `references/section_guide.md` | What a "good" answer looks like for each section, with examples. |
-| `references/email_specifics.md` | Detail on the email-only elements (production, localization, UTMs, compliance, …). |
-| `assets/brief_template.md` | The structural template the final brief is assembled from. |
-| `assets/sample_brief_template.md` | Annotated blank template returned when you ask for a sample. |
+| `skills/email-campaign-brief/SKILL.md` | Generic skill — entry point and interview flow. |
+| `skills/email-campaign-brief-dyspatch/SKILL.md` | Dyspatch variant — same flow, Dyspatch as the production path. |
+| `skills/email-campaign-brief-dyspatch/references/dyspatch_integration.md` | Dyspatch concepts, MCP/API setup, and how the sample layout is grounded in real modules. |
+| `shared/references/section_guide.md` | What a "good" answer looks like for each section, with examples. |
+| `shared/references/email_specifics.md` | Detail on the email-only elements (production, localization, UTMs, compliance, …). |
+| `shared/references/proven_patterns.md` | Curated library of techniques that have worked, with sources. |
+| `shared/assets/brief_template.md` | The structural template the final brief is assembled from. |
+| `shared/assets/sample_brief_template.md` | Annotated blank template returned when you ask for a sample. |
 
 ---
 
@@ -93,10 +113,14 @@ Tooling is plain Node (ESM) with **zero npm dependencies**, driven by `package.j
 
 | Command | What it does |
 | --- | --- |
-| `npm test` | Run the validation suite (`node --test`). Enforces the [Agent Skills spec](https://agentskills.io/specification): `description` ≤ 1024 characters, `name` format/length, optional `compatibility` ≤ 500 characters, and that every referenced `references/`/`assets/` file exists. |
-| `npm run validate` | The same checks as a readable ✓/✗ report. |
-| `npm run bump -- patch\|minor\|major\|<x.y.z>` | Bump the version in `package.json` (the source of truth) and sync it into `SKILL.md` frontmatter `metadata.version`. |
-| `npm run package` | Build `dist/email-campaign-brief-<version>.skill` (a zip). Validates first and refuses to package a failing skill. |
+Both skills are built from one source tree (the set is declared in the `SKILLS` array in `scripts/skill.mjs`), so every command operates on both.
+
+| Command | What it does |
+| --- | --- |
+| `npm test` | Run the validation suite (`node --test`) for every skill. Enforces the [Agent Skills spec](https://agentskills.io/specification): `description` ≤ 1024 characters, `name` format/length, optional `compatibility` ≤ 500 characters, and that every referenced `references/`/`assets/` file exists (skill-local or shared). Also round-trips packaging. |
+| `npm run validate` | The same checks as a readable ✓/✗ report, grouped per skill. |
+| `npm run bump -- patch\|minor\|major\|<x.y.z>` | Bump the single shared version in `package.json` (the source of truth) and sync it into both `SKILL.md` frontmatters' `metadata.version`. |
+| `npm run package` | Build one `dist/<name>-<version>.skill` per skill (a zip), composing the shared `references/`/`assets/` with each skill's own files. Validates first and refuses to package a failing skill. |
 | `npm run build` | `npm test` then `npm run package`. |
 
-Packaging requires the `zip` binary (`apt install zip` / `brew install zip`). The packaged `.skill` ships only `SKILL.md`, `references/`, and `assets/` — the tooling (`package.json`, `scripts/`, `tests/`, `dist/`) is excluded.
+Packaging requires the `zip` binary (`apt install zip` / `brew install zip`). Each packaged `.skill` ships only the composed `SKILL.md`, `references/`, and `assets/` — the tooling (`package.json`, `scripts/`, `tests/`, `dist/`) and the `docs/` marketing site are excluded.
