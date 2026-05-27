@@ -1,9 +1,9 @@
-// CLI: bump the skill version in package.json and sync it into SKILL.md frontmatter.
-// Usage: npm run bump -- patch | minor | major | <x.y.z>
+// CLI: bump the shared version in package.json and sync it into every skill's
+// SKILL.md frontmatter. Usage: npm run bump -- patch | minor | major | <x.y.z>
 
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { ROOT, SKILL_PATH } from './skill.mjs';
+import { ROOT, SKILLS, skillPath } from './skill.mjs';
 
 const spec = process.argv[2];
 if (!spec) {
@@ -21,11 +21,11 @@ function computeNext(current, kind) {
   process.exit(1);
 }
 
-/** Set metadata.version in SKILL.md frontmatter, adding the block if absent. */
-function setSkillVersion(text, version) {
+/** Set metadata.version in a SKILL.md's frontmatter, adding the block if absent. */
+function setSkillVersion(text, version, label) {
   const m = text.match(/^(---\r?\n)([\s\S]*?)(\r?\n---\r?\n?)/);
   if (!m) {
-    console.error('No YAML frontmatter found in SKILL.md');
+    console.error(`No YAML frontmatter found in ${label}`);
     process.exit(1);
   }
   let fm = m[2];
@@ -46,6 +46,10 @@ const next = computeNext(current, spec);
 
 pkg.version = next;
 writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n');
-writeFileSync(SKILL_PATH, setSkillVersion(readFileSync(SKILL_PATH, 'utf8'), next));
 
-console.log(`${current} → ${next}`);
+for (const skill of SKILLS) {
+  const path = skillPath(skill);
+  writeFileSync(path, setSkillVersion(readFileSync(path, 'utf8'), next, `${skill.name}/SKILL.md`));
+}
+
+console.log(`${current} → ${next} (package.json + ${SKILLS.length} SKILL.md file(s))`);

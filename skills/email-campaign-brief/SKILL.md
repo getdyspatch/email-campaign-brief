@@ -2,7 +2,7 @@
 name: email-campaign-brief
 description: Generates a tight, professional email marketing brief through a guided interview. Use whenever the user is planning, scoping, or about to write an email campaign — welcome series, nurture flows, promotional sends, newsletters, product launches, lifecycle/automation, abandonment, re-engagement, or any other email send. Triggers on phrases like "write a brief for my email campaign", "creative brief for an email", "help me scope an email send", "draft a brief for a 3-email nurture", "we're planning a launch email", or any time the user starts an email project with stakeholders, agencies, designers, copywriters, or developers. Also triggers on requests for a sample/blank brief ("show me what a brief looks like", "give me the brief template", "what info do I need for an email brief"). Works for one email or a multi-email sequence. Produces Markdown (default), Word doc, or HTML, and remembers the choice. Includes optional recommendations, sample layout, and sample copy generation.
 metadata:
-  version: "2.1.1"
+  version: "2.1.2"
 ---
 
 # Email Campaign Brief

@@ -1,5 +1,10 @@
 // Shared helpers for the email-campaign-brief skill tooling.
 // Zero dependencies — pure Node ESM. Imported by validate/package/bump and the tests.
+//
+// This repo builds MORE THAN ONE skill from a single source tree: each skill in
+// SKILLS owns a SKILL.md (and may own skill-local references/assets), while the
+// bulk of the content is single-sourced under shared/ and composed into every
+// package at build time. Skill-local files override/extend the shared ones.
 
 import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -9,12 +14,27 @@ const here = dirname(fileURLToPath(import.meta.url));
 
 /** Repo root (one level up from scripts/). */
 export const ROOT = resolve(here, '..');
-/** The skill's `name` — also the directory name used inside the .skill package. */
-export const SKILL_NAME = 'email-campaign-brief';
-/** Path to the skill's SKILL.md. */
-export const SKILL_PATH = join(ROOT, 'SKILL.md');
-/** Allowlist of paths that ship inside the .skill package. Everything else (tooling) is excluded. */
-export const PACKAGE_FILES = ['SKILL.md', 'references', 'assets'];
+
+/**
+ * The skills built from this repo. `name` is the skill's `name` (and the
+ * directory name inside its .skill package); `dir` is its source folder.
+ */
+export const SKILLS = [
+  { name: 'email-campaign-brief', dir: 'skills/email-campaign-brief' },
+  { name: 'email-campaign-brief-dyspatch', dir: 'skills/email-campaign-brief-dyspatch' },
+];
+
+/** Single-sourced content shared by every skill (shared/references, shared/assets). */
+export const SHARED_DIR = 'shared';
+/** Directories composed into each package: shared first, then skill-local on top. */
+export const PACKAGE_DIRS = ['references', 'assets'];
+
+/** Look up a skill by name; throws if unknown. */
+export function skillByName(name) {
+  const skill = SKILLS.find((s) => s.name === name);
+  if (!skill) throw new Error(`Unknown skill: ${name} (known: ${SKILLS.map((s) => s.name).join(', ')})`);
+  return skill;
+}
 
 function unquote(s) {
   s = s.trim();
@@ -60,9 +80,14 @@ export function parseFrontmatter(text) {
   return { data, body };
 }
 
-/** Read and parse SKILL.md. Returns { text, data, body }. */
-export function readSkill() {
-  const text = readFileSync(SKILL_PATH, 'utf8');
+/** Absolute path to a skill's SKILL.md. */
+export function skillPath(skill) {
+  return join(ROOT, skill.dir, 'SKILL.md');
+}
+
+/** Read and parse a skill's SKILL.md. Returns { text, data, body }. */
+export function readSkill(skill) {
+  const text = readFileSync(skillPath(skill), 'utf8');
   const { data, body } = parseFrontmatter(text);
   return { text, data, body };
 }
@@ -74,11 +99,24 @@ export function listReferencedFiles(body) {
 }
 
 /**
- * Validate the skill against the Agent Skills spec (agentskills.io/specification).
- * Returns an array of { name, ok, message } — pure, no I/O side effects beyond reading.
+ * Resolve a referenced `references/…` or `assets/…` path for a skill the way
+ * packaging composes it: skill-local first, then the shared pool. Returns the
+ * absolute path it was found at, or null if it exists in neither place.
  */
-export function validateSkill() {
-  const { data, body } = readSkill();
+export function resolveReferenced(skill, rel) {
+  const local = join(ROOT, skill.dir, rel);
+  if (existsSync(local)) return local;
+  const shared = join(ROOT, SHARED_DIR, rel);
+  if (existsSync(shared)) return shared;
+  return null;
+}
+
+/**
+ * Validate one skill against the Agent Skills spec (agentskills.io/specification).
+ * Returns an array of { name, ok, message } — pure, no I/O beyond reading.
+ */
+export function validateSkill(skill) {
+  const { data, body } = readSkill(skill);
   const results = [];
   const add = (name, ok, message = '') => results.push({ name, ok, message });
 
@@ -94,6 +132,8 @@ export function validateSkill() {
     /^[a-z0-9]+(-[a-z0-9]+)*$/.test(name),
     'must be lowercase a-z/0-9 with single hyphens, no leading/trailing/consecutive hyphens',
   );
+  // name must match the directory it ships under.
+  add('name matches skill folder', name === skill.name, `name "${name}" ≠ folder "${skill.name}"`);
 
   // description: 1–1024 chars (measured in code points, not bytes). The headline rule.
   const descLen = [...description].length;
@@ -106,9 +146,9 @@ export function validateSkill() {
     add('compatibility ≤ 500 chars', compLen <= 500, `compatibility is ${compLen} chars`);
   }
 
-  // Referenced files must exist on disk.
+  // Referenced files must exist — skill-local or in the shared pool.
   for (const rel of listReferencedFiles(body)) {
-    add(`referenced file exists: ${rel}`, existsSync(join(ROOT, rel)), `missing ${rel}`);
+    add(`referenced file exists: ${rel}`, resolveReferenced(skill, rel) !== null, `missing ${rel}`);
   }
 
   // Recommended: keep SKILL.md body under 500 lines (guards future bloat).

@@ -23,8 +23,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.event.release.tag_name }}
-        # Attach the versioned .skill plus a stable, versionless copy so the
-        # marketing site can link to releases/latest/download/email-campaign-brief.skill
+        # Attach each skill's versioned .skill plus a stable, versionless copy so the
+        # marketing site can link to releases/latest/download/<name>.skill. Both skills
+        # share the package.json version, so derive it rather than globbing (the Dyspatch
+        # name starts with "email-campaign-brief-", which a glob would also match).
         run: |
-          cp dist/email-campaign-brief-*.skill email-campaign-brief.skill
-          gh release upload "$TAG" dist/*.skill email-campaign-brief.skill --clobber
+          VER=$(node -p "require('./package.json').version")
+          cp "dist/email-campaign-brief-${VER}.skill" email-campaign-brief.skill
+          cp "dist/email-campaign-brief-dyspatch-${VER}.skill" email-campaign-brief-dyspatch.skill
+          gh release upload "$TAG" dist/*.skill email-campaign-brief.skill email-campaign-brief-dyspatch.skill --clobber
